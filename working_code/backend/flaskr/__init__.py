@@ -125,7 +125,7 @@ def create_app(test_config=None):
 
 
   '''
-  @TODO: 
+  
   Create an endpoint to POST a new question, 
   which will *require* the question and answer text, 
   category, and difficulty score.
@@ -153,7 +153,7 @@ def create_app(test_config=None):
     try:  
       db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
       db_question.insert()
-      
+
       return jsonify({
         'success': True,
         'created': db_question.id
@@ -162,13 +162,11 @@ def create_app(test_config=None):
     except:
       abort(422)
 
-   
-
-      
+    
 
     
   '''
-  @TODO: 
+ 
   Create a POST endpoint to get questions based on a search term. 
   It should return any questions for whom the search term 
   is a substring of the question. 
@@ -178,9 +176,23 @@ def create_app(test_config=None):
   Try using the word "title" to start. 
   '''
   @app.route('/questions/search', methods=["POST"])
-  def search_question():
-    pass
+  def search_questions():
 
+    body = request.get_json()
+    
+    search_query = body.get('searchTerm', None)
+
+    if search_query:
+      search_results = Question.query.filter(Question.question.ilike(f'%{search_query}%'))
+      questions_found = [question.format() for question in search_results]
+
+      return jsonify({
+        'success': True,
+        'questions': questions_found,
+        'total_questions': len(search_results)        
+      })
+
+    
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
