@@ -2,7 +2,11 @@ import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
+from random import randint
 import random
+import sys
+
+from sqlalchemy.sql.elements import Null
 
 from models import setup_db, Question, Category
 
@@ -33,7 +37,7 @@ def create_app(test_config=None):
         return response
 
   '''
-  @TODO: 
+ 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
@@ -57,7 +61,7 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO: 
+  
   Create an endpoint to handle GET requests for questions, 
   including pagination (every 10 questions). 
   This endpoint should return a list of questions, 
@@ -96,8 +100,7 @@ def create_app(test_config=None):
     })
 
   '''
-  @TODO: 
-   
+    
 
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
@@ -149,7 +152,7 @@ def create_app(test_config=None):
     for part in question_parts:
       
       if part is None:
-        abort(422)
+        abort(404)
     try:  
       db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
       db_question.insert()
@@ -185,16 +188,17 @@ def create_app(test_config=None):
     if search_query:
       search_results = Question.query.filter(Question.question.ilike(f'%{search_query}%'))
       questions_found = [question.format() for question in search_results]
-
+    
       return jsonify({
         'success': True,
         'questions': questions_found,
-        'total_questions': len(search_results)        
+        'totalQuestions': len(questions_found),
+        'currentCategory': None
       })
 
     
   '''
-  @TODO: 
+  
   Create a GET endpoint to get questions based on category. 
 
   TEST: In the "List" tab / main screen, clicking on one of the 
@@ -202,9 +206,33 @@ def create_app(test_config=None):
   category to be shown. 
   '''
 
+  @app.route('/categories/<int:category_id>/questions', methods=["GET"])
+  def get_questions_by_category(category_id):
+    try:
+      
+      print("**************************")
+      print("type - {}".format(category_id))
+      print("**************************")
+      
+      #questions = Question.query.filter(Question.category == str(category_id))
+      questions = Question.query.filter(Question.category == category_id).all()
+
+      if questions == Null:
+        abort(404)
+
+      return jsonify({
+        'success': True,
+        'questions': [question.format() for question in questions],
+        'total_questions': len(questions)        
+      })
+
+      
+    except:
+      abort(422)
+
+
 
   '''
-  @TODO: 
   Create a POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
   and return a random questions within the given category, 
@@ -214,12 +242,40 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=["POST"])
+  def play_quiz():
+    try:
+       
 
-  '''
+        body = request.get_json()
+
+        if body.get('quiz_category') == Null or body.get('previous_questions') == Null:
+          abort(422)
+
+        category = body.get('quiz_category')
+        previous_questions =  body.get('previous_questions')
+
+        if category['type'] == 'click':
+          available_questions = Question.query.filter((Question.id.notin_(previous_questions))).all()
+
+        else:
+          
+          available_questions = Question.query.filter_by(Question.category == category['type']).filter((Question.id.notin_(previous_questions))).all()
+        
+        total_available_questions = len(available_questions)
+
+        if total_available_questions > 0:
+          quiz_question = available_questions[randint(0,total_available_questions)].format()
+
+        # return the question
+        return jsonify({
+            'success': True,
+            'question': quiz_question
+        })
+    except:
+        abort(422)
   
-  Create error handlers for all expected errors 
-  including 404 and 422. 
-  '''
+    
   
   @app.errorhandler(404)
   def not_found(error):
