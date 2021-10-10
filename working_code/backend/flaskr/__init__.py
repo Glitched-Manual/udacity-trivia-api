@@ -99,8 +99,7 @@ def create_app(test_config=None):
         'current_category': None
     })
 
-  '''
-    
+  '''  
 
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
@@ -180,21 +179,28 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/search', methods=["POST"])
   def search_questions():
+    try:
+      body = request.get_json()
+      
+      search_query = body.get('searchTerm', None)
 
-    body = request.get_json()
-    
-    search_query = body.get('searchTerm', None)
+      if search_query:
+        search_results = Question.query.filter(Question.question.ilike(f'%{search_query}%'))
+        questions_found = [question.format() for question in search_results]
+      
+        if len(questions_found) == 0:
+          abort(404)
 
-    if search_query:
-      search_results = Question.query.filter(Question.question.ilike(f'%{search_query}%'))
-      questions_found = [question.format() for question in search_results]
-    
-      return jsonify({
-        'success': True,
-        'questions': questions_found,
-        'totalQuestions': len(questions_found),
-        'currentCategory': None
-      })
+        
+
+        return jsonify({
+          'success': True,
+          'questions': questions_found,
+          'totalQuestions': len(questions_found),
+          'currentCategory': None
+        })
+    except:
+      abort(404)
 
     
   '''
@@ -292,7 +298,10 @@ def create_app(test_config=None):
         )
   @app.errorhandler(400)
   def bad_request(error):
-        return jsonify({"success": False, "error": 400, "message": "bad request"}), 400
+        return (
+          jsonify({"success": False, "error": 400, "message": "bad request"}), 
+        400,
+        )
 
   @app.errorhandler(405)
   def not_found(error):

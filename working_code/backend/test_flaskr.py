@@ -48,10 +48,13 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertTrue(data['categories'], True)
 
-        """ 
-       'success': True,
-        'categories': category_dictionary
-        """
+    def test_404_request_category_not_found(self):
+        res = self.client().get('/categories/9000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
 
     """
     /questions tests
@@ -84,8 +87,106 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
+    
+    """
+    /question delete tests
+
+    """
+    
+    def test_delete_question(self):
+
+        #create question to delete for test
+        test_question = Question(question=self.new_question['question'], answer=self.new_question['answer'], category=self.new_question['category'], difficulty=self.new_question['difficulty'])
+        test_question.insert()
+        
+        test_question_id = test_question.id
+
+        # call delete method
+
+        res = self.client().delete(f'/questions/{test_question_id}')
+        data = json.loads(res.data)
+
+        # check for success code and message
+        self.assertTrue(res.status_code, 200)
+        self.assertTrue(data['success'], True)
+
+        #check if te correct question was deleted
+        self.assertEqual(data['deleted'], str(test_question_id))
+
+        #check if the created question is now None or Null value
+        self.assertTrue(test_question, None)
 
 
+    def test_422_for_deleting_question_that_does_not_exist(self):
+
+        res = self.client().delete('/questions/1000000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "unprocessable")
+
+
+    def test_create_question(self):
+       
+        before_create_questions_length = len(Question.query.all())
+
+        test_question = Question(question=self.new_question['question'], answer=self.new_question['answer'], category=self.new_question['category'], difficulty=self.new_question['difficulty'])
+       
+
+        res = self.client().post('/questions', json=test_question)
+        data = json.loads(res.data)
+
+        after__create_questions_length = len(Question.query.all())
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(before_create_questions_length, after__create_questions_length - 1)
+
+
+    def test_422_create_question_error(self):
+
+        before_create_questions_length = len(Question.query.all())
+
+        # create question method wit blank dict
+
+        res = self.client().post('/questions', json={})
+        data = json.loads(res.data)
+
+        # questions after post request
+
+        after__create_questions_length = len(Question.query.all())
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        
+        #check if question before and after lengths are the same
+        self.assertEqual(before_create_questions_length, after__create_questions_length)
+
+
+    def test_search_questions(self):
+
+        res = self.client().post('questions/search', json={'searchTerm': 'm'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertIsNotNone(data['questions'])
+        self.assertIsNotNone(data['totalQuestions'])
+
+    def test_404_search_questions_error(self):
+        # search blank
+        res = self.client().post('questions/search', json={'searchTerm': ''})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "resource not found")
+
+
+    
+
+        
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
