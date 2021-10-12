@@ -96,7 +96,7 @@ def create_app(test_config=None):
         'questions': selected_questions,
         'categories': category_dictionary,
         'total_questions': total_questions,
-        'current_category': None
+        
     })
 
   '''  
@@ -151,7 +151,7 @@ def create_app(test_config=None):
     for part in question_parts:
       
       if part is None:
-        abort(404)
+        abort(422)
     try:  
       db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
       db_question.insert()
@@ -184,14 +184,15 @@ def create_app(test_config=None):
       
       search_query = body.get('searchTerm', None)
 
+      if search_query == '':
+        abort(404)
+
       if search_query:
         search_results = Question.query.filter(Question.question.ilike(f'%{search_query}%'))
         questions_found = [question.format() for question in search_results]
       
         if len(questions_found) == 0:
-          abort(404)
-
-        
+          abort(404)        
 
         return jsonify({
           'success': True,
@@ -215,15 +216,11 @@ def create_app(test_config=None):
   @app.route('/categories/<int:category_id>/questions', methods=["GET"])
   def get_questions_by_category(category_id):
     try:
-      
-      print("**************************")
-      print("type - {}".format(category_id))
-      print("**************************")
-      
-      #questions = Question.query.filter(Question.category == str(category_id))
-      questions = Question.query.filter(Question.category == category_id).all()
+              
+     
+      questions = Question.query.filter(Question.category == str(category_id)).all()
 
-      if questions == Null:
+      if len(questions) < 1 :
         abort(404)
 
       return jsonify({
@@ -234,7 +231,7 @@ def create_app(test_config=None):
 
       
     except:
-      abort(422)
+      abort(404)
 
 
 

@@ -16,8 +16,8 @@ class TriviaTestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.database_name = "trivia_test"
         #self.password = ""
-        #self.database_path = "postgresql://student:student@{}/{}".format('localhost:5432', self.database_name)
-        self.database_path = "postgresql://{}/{}".format('localhost:5432', self.database_name)
+        self.database_path = "postgresql://student:student@{}/{}".format('localhost:5432', self.database_name)
+        #self.database_path = "postgresql://{}/{}".format('localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -98,7 +98,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_delete_question(self):
 
         #create question to delete for test
-        test_question = Question(question=self.new_question['question'], answer=self.new_question['answer'], category=self.new_question['category'], difficulty=self.new_question['difficulty'])
+        test_question = Question(question='question', answer='answer', category=1, difficulty=1)
         test_question.insert()
         
         test_question_id = test_question.id
@@ -113,7 +113,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['success'], True)
 
         #check if te correct question was deleted
-        self.assertEqual(data['deleted'], str(test_question_id))
+        self.assertEqual(str(data['deleted']), str(test_question_id))
 
         #check if the created question is now None or Null value
         self.assertTrue(test_question, None)
@@ -133,7 +133,7 @@ class TriviaTestCase(unittest.TestCase):
        
         before_create_questions_length = len(Question.query.all())
 
-        test_question = Question(question=self.new_question['question'], answer=self.new_question['answer'], category=self.new_question['category'], difficulty=self.new_question['difficulty'])
+        test_question = {'question':'question', 'answer':'answer', 'category':2, 'difficulty':2}
        
 
         res = self.client().post('/questions', json=test_question)
@@ -212,7 +212,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 404)
-        self.assertEqual(data['success'], True)
+        self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "resource not found")
 
     def test_play_quiz(self):
@@ -236,8 +236,8 @@ class TriviaTestCase(unittest.TestCase):
                           'quiz_category': {'type': 'Entertainment', 'id': 5}}
         """
     def test_404_quiz_error(self):
-        test_quiz_round = {'previous_questions', []}
-        res = self.client().post('/quizzes', json=test_quiz_round)
+        #test_quiz_round = {'previous_questions', []}
+        res = self.client().post('/quizzes', json={})
 
         data = json.loads(res.data)
 
