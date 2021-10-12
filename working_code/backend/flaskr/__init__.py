@@ -7,6 +7,7 @@ import random
 import sys
 
 from sqlalchemy.sql.elements import Null
+from sqlalchemy.sql.expression import null
 
 from models import setup_db, Question, Category
 
@@ -162,6 +163,7 @@ def create_app(test_config=None):
       })
 
     except:
+          
       abort(422)
 
     
@@ -252,31 +254,42 @@ def create_app(test_config=None):
 
         body = request.get_json()
 
-        if body.get('quiz_category') == Null or body.get('previous_questions') == Null:
+        if (body.get('quiz_category') == None) or (body.get('previous_questions') == None):
+          
           abort(422)
 
         category = body.get('quiz_category')
         previous_questions =  body.get('previous_questions')
+
+        quiz_question = null
 
         if category['type'] == 'click':
           available_questions = Question.query.filter((Question.id.notin_(previous_questions))).all()
 
         else:
           
-          available_questions = Question.query.filter_by(Question.category == category['type']).filter((Question.id.notin_(previous_questions))).all()
+          available_questions = Question.query.filter(Question.category == str(category['id'])).filter((Question.id.notin_(previous_questions))).all()
         
         total_available_questions = len(available_questions)
 
         if total_available_questions > 0:
           quiz_question = available_questions[randint(0,total_available_questions)].format()
-
+        print("4444444444444444444444")
+        print(total_available_questions)
+        print(quiz_question)
+        print("4444444444444444444444")
         # return the question
         return jsonify({
             'success': True,
             'question': quiz_question
         })
     except:
-        abort(422)
+
+      print("******************************")
+      print(sys.exc_info())
+      print("******************************")
+
+      abort(422)
   
     
   
