@@ -133,7 +133,7 @@ class TriviaTestCase(unittest.TestCase):
        
         before_create_questions_length = len(Question.query.all())
 
-        test_question = {'question':'question', 'answer':'answer', 'category':2, 'difficulty':2}
+        test_question = {'question': 'question', 'answer': 'answer', 'category': 2, 'difficulty': 2}
        
 
         res = self.client().post('/questions', json=test_question)
@@ -148,7 +148,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_422_create_question_error(self):
 
-        before_create_questions_length = len(Question.query.all())
+        before_create_questions_total = len(Question.query.all())
 
         # create question method wit blank dict
 
@@ -157,13 +157,13 @@ class TriviaTestCase(unittest.TestCase):
 
         # questions after post request
 
-        after__create_questions_length = len(Question.query.all())
+        after__create_questions_total = len(Question.query.all())
 
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         
         #check if question before and after lengths are the same
-        self.assertEqual(before_create_questions_length, after__create_questions_length)
+        self.assertEqual(before_create_questions_total, after__create_questions_total)
 
 
     def test_search_questions(self):
@@ -185,11 +185,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "resource not found")
 
-    """
-    /categories/<int:category_id>/questions
-    
-    """
-    
+        
     def test_get_category_questions(self):
         #get questions from an existing
         res = self.client().get('/categories/2/questions')
@@ -198,11 +194,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        """
-        'questions': [question.format() for question in questions],
-        'total_questions': len(questions)
-            
-        """
+        
         self.assertTrue(len(data['questions']), True)
         self.assertTrue(data['total_questions'], True)
 
@@ -227,16 +219,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         
         self.assertTrue(data['question']['category'], 2)
-        """
-        category = body.get('quiz_category')
-        previous_questions =  body.get('previous_questions')
-        2 | Art
-
-        new_quiz_round = {'previous_questions': [],
-                          'quiz_category': {'type': 'Entertainment', 'id': 5}}
-        """
-    def test_422_quiz_error(self):
-        #test_quiz_round = {'previous_questions', []}
+       
+    def test_422_quiz_error(self):       
         res = self.client().post('/quizzes', json={})
 
         data = json.loads(res.data)

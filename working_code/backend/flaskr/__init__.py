@@ -93,12 +93,11 @@ def create_app(test_config=None):
          abort(404)
 
        return jsonify({
-        'success': True,
-        'questions': selected_questions,
-        'categories': category_dictionary,
-        'total_questions': total_questions,
-        
-    })
+          'success': True,
+          'questions': selected_questions,
+          'categories': category_dictionary,
+          'total_questions': total_questions,
+           })
 
   '''  
 
@@ -154,21 +153,18 @@ def create_app(test_config=None):
       if part is None:
         abort(422)
     try:  
-      db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
-      db_question.insert()
+        db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
+        db_question.insert()
 
-      return jsonify({
-        'success': True,
-        'created': db_question.id
-      })
+        return jsonify({
+            'success': True,
+            'created': db_question.id
+            })
 
     except:
           
       abort(422)
-
-    
-
-    
+     
   '''
  
   Create a POST endpoint to get questions based on a search term. 
@@ -217,18 +213,17 @@ def create_app(test_config=None):
 
   @app.route('/categories/<int:category_id>/questions', methods=["GET"])
   def get_questions_by_category(category_id):
-    try:
-              
+    try:              
      
       questions = Question.query.filter(Question.category == str(category_id)).all()
 
       if len(questions) < 1 :
-        abort(404)
+          abort(404)
 
       return jsonify({
-        'success': True,
-        'questions': [question.format() for question in questions],
-        'total_questions': len(questions)        
+          'success': True,
+          'questions': [question.format() for question in questions],
+          'total_questions': len(questions)        
       })
 
       
@@ -256,7 +251,7 @@ def create_app(test_config=None):
 
         if (body.get('quiz_category') == None) or (body.get('previous_questions') == None):
           
-          abort(422)
+            abort(422)
 
         category = body.get('quiz_category')
         previous_questions =  body.get('previous_questions')
@@ -264,20 +259,17 @@ def create_app(test_config=None):
         quiz_question = null
 
         if category['type'] == 'click':
-          available_questions = Question.query.filter((Question.id.notin_(previous_questions))).all()
+            available_questions = Question.query.filter((Question.id.notin_(previous_questions))).all()
 
         else:
           
-          available_questions = Question.query.filter(Question.category == str(category['id'])).filter((Question.id.notin_(previous_questions))).all()
+            available_questions = Question.query.filter(Question.category == str(category['id'])).filter((Question.id.notin_(previous_questions))).all()
         
         total_available_questions = len(available_questions)
 
         if total_available_questions > 0:
-          quiz_question = available_questions[randint(0,total_available_questions)].format()
-        print("4444444444444444444444")
-        print(total_available_questions)
-        print(quiz_question)
-        print("4444444444444444444444")
+            quiz_question = available_questions[randint(0,total_available_questions)].format()
+        
         # return the question
         return jsonify({
             'success': True,
@@ -302,10 +294,10 @@ def create_app(test_config=None):
 
   @app.errorhandler(422)
   def unprocessable(error):
-        return (
-            jsonify({"success": False, "error": 422, "message": "unprocessable"}),
-            422,
-        )
+          return (
+              jsonify({"success": False, "error": 422, "message": "unprocessable"}),
+              422,
+          )
   @app.errorhandler(400)
   def bad_request(error):
         return (
