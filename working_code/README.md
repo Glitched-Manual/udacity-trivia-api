@@ -121,4 +121,18 @@ The API will return three error types when requests fail:
 
   - returns all available categories
 
-- Smaple: `curl http://localhost:5000/categories`
+- Sample: `curl http://localhost:5000/categories`
+
+```bash
+{
+  "categories": {
+    "1": "Science",       
+    "2": "Art",
+    "3": "Geography",     
+    "4": "History",       
+    "5": "Entertainment", 
+    "6": "Sports"
+  },
+  "success": true
+}
+```
