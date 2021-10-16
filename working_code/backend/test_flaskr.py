@@ -209,7 +209,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_play_quiz(self):
         test_quiz_round = {'previous_questions': [],
-                            'quiz_category': { 'type': 'Art', 'id': 2}}
+                           'quiz_category': { 'type': 'Art', 'id': 2}}
 
         res = self.client().post('/quizzes', json=test_quiz_round)
 

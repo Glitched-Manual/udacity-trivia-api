@@ -248,7 +248,7 @@ def create_app(test_config=None):
        
 
         body = request.get_json()
-
+        
         if (body.get('quiz_category') == None) or (body.get('previous_questions') == None):
           
             abort(422)

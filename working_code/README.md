@@ -255,7 +255,7 @@ The API will return three error types when requests fail:
   - creates a new question
   - returns success when the new question is added
 
-- Sample (windows): `curl -H "Content-Type: application/json" -X POST -d {\"question\":\"question\",\"answer\":\"easy\",\"difficulty\":\"1\",\"category\":\"1\"} http://localhost:5000/questions`
+- Sample (CMD): `curl -H "Content-Type: application/json" -X POST -d {\"question\":\"question\",\"answer\":\"easy\",\"difficulty\":\"1\",\"category\":\"1\"} http://localhost:5000/questions`
 
 - Sample (Linux): `curl -H "Content-Type: application/json" -X POST -d '{"question":"new question", "answer":"easy answer", "difficulty":"1", "category":"1"}' http://localhost:5000/questions`
 
@@ -263,5 +263,100 @@ The API will return three error types when requests fail:
 {
   "created": 25,
   "success": true
-}```
+}
+```
 
+#### Post /questions/search
+
+- General
+
+  - Searches and returns, all the questions in the database that contain the provided search term.
+
+- Sample (CMD): `curl -H "Content-Type: application/json" -X POST -d {\"searchTerm\":\"invented\"} http://localhost:5000/questions/search`
+
+- Sample (Linux): `curl -H "Content-Type: application/json" -X POST -d '{"searchTerm":"invented"}' http://localhost:5000/questions/search`
+
+```bash
+{
+  "currentCategory": null,
+  "questions": [
+    {
+      "answer": "George Washington Carver",
+      "category": 4,
+      "difficulty": 2,
+      "id": 12,
+      "question": "Who invented Peanut Butter?"
+    }
+  ],
+  "success": true,
+  "totalQuestions": 1
+}
+```
+
+#### /categories/<int:category_id>/questions
+
+- General
+  
+  - searches and returns all questions from the provided category id
+
+- Sample: `curl http://127.0.0.1:5000/categories/2/questions`
+
+```bash
+{
+  "questions": [
+    {
+      "answer": "Escher",
+      "category": 2,
+      "difficulty": 1,
+      "id": 16,
+      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    },
+    {
+      "answer": "Mona Lisa",
+      "category": 2,
+      "difficulty": 3,
+      "id": 17,
+      "question": "La Giaconda is better known as what?"
+    },
+    {
+      "answer": "One",
+      "category": 2,
+      "difficulty": 4,
+      "id": 18,
+      "question": "How many paintings did Van Gogh sell in his lifetime?"
+    },
+    {
+      "answer": "Jackson Pollock",
+      "category": 2,
+      "difficulty": 2,
+      "id": 19,
+      "question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?"
+    }
+  ],
+  "success": true,
+  "total_questions": 4
+}
+```
+
+#### /quizzes
+
+- General
+  
+  - a
+
+- Sample (CMD): `curl -X POST -H "Content-Type: application/json" -d {\"previous_questions\":[],\"quiz_category\":{\"type\":\"Art\",\"id\":\"2\"}} http://127.0.0.1:5000/quizzes`
+
+- Sample (Linux): `curl -X POST -H "Content-Type: application/json" -d {"previous_questions": [], "quiz_category": {"type": "Art", "id": "2"}} http://127.0.0.1:5000/quizzes`
+
+```bash
+{
+  "question": {
+    "answer": "Mona Lisa",
+    "category": 2,
+    "difficulty": 3,
+    "id": 17,
+    "question": "La Giaconda is better known as what?"
+  },
+  "success": true
+}
+```
