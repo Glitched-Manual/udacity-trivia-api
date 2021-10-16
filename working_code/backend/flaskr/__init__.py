@@ -216,7 +216,7 @@ def create_app(test_config=None):
     try:              
      
       questions = Question.query.filter(Question.category == str(category_id)).all()
-
+      # current_category.type
       if len(questions) < 1 :
           abort(404)
 
