@@ -4,7 +4,6 @@ This trivia API project is a completed version of the Udacity Full Stack trivia 
 
 The application contains the following features:
 
-
 1. Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer.
 2. Delete questions.
 3. Add questions and require that they include question and answer text.
@@ -15,7 +14,7 @@ The application contains the following features:
 
 -----
 
-### Needed Skills
+### Prerequisite Tools
 
 Developers who wish to use this project must have the following tools installed:
 
@@ -46,6 +45,7 @@ npm install
 ```
 
 ## Starting the Server
+
 -----
 In the `/backend` directory that is within your virtual environment.
 
@@ -70,6 +70,7 @@ flask run
 ## Starting the frontend in Developer mode
 
 -----
+
 To run the app in development mode. Navigate to the `/frontend` directory and run:
 
 ```bash
@@ -79,27 +80,30 @@ npm start
 Open http://localhost:3000 to view the frontend site in your browser. The page will reload if you make edits.
 
 ## Tests
+
 -----
+
 To run Test navigate to `/backend` and run the script `test_flaskr.py`
 
 ```bash
 python3 test_flaskr.py
 ```
 
-
 ## API Reference
+
+-----
 
 ### Getting Started
 
 - Base URL: At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`.
 
-- Authentication: This version of the application does not require authentication or API keys. 
+- Authentication: This version of the application does not require authentication or API keys.
 
 ### Error Handling
 
 Errors are returned in the form of JSON objects in the following format:
 
-```
+```bash
 {
     "success": False, 
     "error": 400,
@@ -107,15 +111,23 @@ Errors are returned in the form of JSON objects in the following format:
 }
 ```
 
-The API will return three error types when requests fail:
+The API will return one of three error types when requests fail:
 
 - 400: Bad Request
 - 404: Resource Not Found
-- 422: Not Processable 
+- 422: Not Processable
 
-### Endpoints
+&nbsp;
 
-#### Get /categories
+## Endpoints
+
+-----
+
+&nbsp;
+
+### Get /categories
+
+&nbsp;
 
 - General:
 
@@ -137,7 +149,9 @@ The API will return three error types when requests fail:
 }
 ```
 
-#### Get /questions
+### Get /questions
+
+&nbsp;
 
 - General:
   - returns the available categories
@@ -233,7 +247,9 @@ The API will return three error types when requests fail:
 }
 ```
 
-#### Delete /questions/<int:question_id>
+### Delete /questions/<int:question_id>
+
+&nbsp;
 
 - General:
   - deletes the question that matches the given id passed to the end point
@@ -248,7 +264,9 @@ The API will return three error types when requests fail:
 }
 ```
 
-#### Post /questions
+### Post /questions
+
+&nbsp;
 
 - General:
   
@@ -266,7 +284,9 @@ The API will return three error types when requests fail:
 }
 ```
 
-#### Post /questions/search
+### Post /questions/search
+
+&nbsp;
 
 - General
 
@@ -293,7 +313,9 @@ The API will return three error types when requests fail:
 }
 ```
 
-#### /categories/<int:category_id>/questions
+### /categories/<int:category_id>/questions
+
+&nbsp;
 
 - General
   
@@ -342,9 +364,17 @@ The API will return three error types when requests fail:
 
 - General
   
-  - a
+  - The `/quizzes` endpoint allows players to play the quiz game.
+
+  - The endpoint take the previously answered questions and the catergory to select the next question
+
+  - If a question(s) exist that is not within the previous_questions perameter, one question will be returned from the available selection at random.
+
+&nbsp;
 
 - Sample (CMD): `curl -X POST -H "Content-Type: application/json" -d {\"previous_questions\":[],\"quiz_category\":{\"type\":\"Art\",\"id\":\"2\"}} http://127.0.0.1:5000/quizzes`
+
+&nbsp;
 
 - Sample (Linux): `curl -X POST -H "Content-Type: application/json" -d {"previous_questions": [], "quiz_category": {"type": "Art", "id": "2"}} http://127.0.0.1:5000/quizzes`
 
