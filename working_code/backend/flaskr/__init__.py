@@ -138,43 +138,32 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=["POST"])
   def create_question():
+        
+      body = request.get_json()      
+      question = body.get('question')
+      answer = body.get('answer')
+      difficulty = body.get('difficulty')
+      category = body.get('category')
     
-    body = request.get_json()      
-    question = body.get('question')
-    answer = body.get('answer')
-    difficulty = body.get('difficulty')
-    category = body.get('category')
-    
-    # make sure no null valus are found
-    question_parts = [question,answer,difficulty,category]
+      # make sure no null valus are found
+      question_parts = [question,answer,difficulty,category]
 
-    for part in question_parts:
+      for part in question_parts:
       
-      if part is None:
-        abort(422)
-    try:  
-        db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
-        db_question.insert()
+        if part is None:
+          abort(422)
+      try:  
+          db_question = Question(question=question, answer=answer, difficulty=difficulty, category=category)
+          db_question.insert()
 
-        return jsonify({
-            'success': True,
-            'created': db_question.id
-            })
+          return jsonify({
+              'success': True,
+              'created': db_question.id
+              })
 
-    except:
-          
-      abort(422)
-     
-  '''
- 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
-
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
+      except:        
+        abort(422)  
+  
   @app.route('/questions/search', methods=["POST"])
   def search_questions():
     try:
@@ -193,27 +182,17 @@ def create_app(test_config=None):
           abort(404)        
 
         return jsonify({
-          'success': True,
-          'questions': questions_found,
-          'totalQuestions': len(questions_found),
-          'currentCategory': None
+            'success': True,
+            'questions': questions_found,
+            'totalQuestions': len(questions_found),
+            'currentCategory': None
         })
     except:
-      abort(404)
-
-    
-  '''
-  
-  Create a GET endpoint to get questions based on category. 
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
+      abort(404) 
 
   @app.route('/categories/<int:category_id>/questions', methods=["GET"])
   def get_questions_by_category(category_id):
-    try:              
+    try:           
      
       questions = Question.query.filter(Question.category == str(category_id)).all()
       
@@ -226,35 +205,13 @@ def create_app(test_config=None):
           'total_questions': len(questions),
           'current_category': category_id        
       })
-
       
     except:
       abort(404)
-
-
-
-  '''
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-
-  Optional: Game Play Mechanics
-
-  Currently, when a user plays the game they play up to five questions of the chosen category. 
-  If there are fewer than five questions in a category, the game will end when there are no more questions in that category.
-
-  You can optionally update this game play to increase the number of questions or whatever other game mechanics you decide. 
-  Make sure to specify the new mechanics of the game in the README of the repo you submit so the reviewers are aware that the behavior is correct.
-  '''
+  
   @app.route('/quizzes', methods=["POST"])
   def play_quiz():
-    try:
-       
+    try:       
 
         body = request.get_json()
         
@@ -264,21 +221,19 @@ def create_app(test_config=None):
 
         category = body.get('quiz_category')
         previous_questions =  body.get('previous_questions')
-
         quiz_question = null
 
         if category['type'] == 'click':
             available_questions = Question.query.filter((Question.id.notin_(previous_questions))).all()
 
-        else:
-          
+        else:          
             available_questions = Question.query.filter(Question.category == str(category['id'])).filter((Question.id.notin_(previous_questions))).all()
         
         total_available_questions = len(available_questions)
         print("total_available_questions = {}".format(total_available_questions))
         if total_available_questions != 0:
-            selected_index = randint(0,total_available_questions - 1)
-            print("selected_index = {}".format(selected_index))
+            # select a question at random within the availble range
+            selected_index = randint(0,total_available_questions - 1)            
             quiz_question = available_questions[selected_index].format()
         else:
           # return success if no questions are available
