@@ -242,6 +242,14 @@ def create_app(test_config=None):
   TEST: In the "Play" tab, after a user selects "All" or a category,
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
+
+  Optional: Game Play Mechanics
+
+  Currently, when a user plays the game they play up to five questions of the chosen category. 
+  If there are fewer than five questions in a category, the game will end when there are no more questions in that category.
+
+  You can optionally update this game play to increase the number of questions or whatever other game mechanics you decide. 
+  Make sure to specify the new mechanics of the game in the README of the repo you submit so the reviewers are aware that the behavior is correct.
   '''
   @app.route('/quizzes', methods=["POST"])
   def play_quiz():
@@ -250,8 +258,8 @@ def create_app(test_config=None):
 
         body = request.get_json()
         
-        if (body.get('quiz_category') == None) or (body.get('previous_questions') == None):
-          
+        if (body.get('quiz_category') == null ) or (body.get('previous_questions') == null):
+            print("***previous question is null***")
             abort(422)
 
         category = body.get('quiz_category')
@@ -267,21 +275,25 @@ def create_app(test_config=None):
             available_questions = Question.query.filter(Question.category == str(category['id'])).filter((Question.id.notin_(previous_questions))).all()
         
         total_available_questions = len(available_questions)
+        print("total_available_questions = {}".format(total_available_questions))
+        if total_available_questions != 0:
+            selected_index = randint(0,total_available_questions - 1)
+            print("selected_index = {}".format(selected_index))
+            quiz_question = available_questions[selected_index].format()
+        else:
+          # return success if no questions are available
+             print("questions == 0")
+             return jsonify({
+            'success': True
+            })
 
-        if total_available_questions > 0:
-            quiz_question = available_questions[randint(0,total_available_questions)].format()
-        
         # return the question
         return jsonify({
             'success': True,
             'question': quiz_question
         })
     except:
-
-      print("******************************")
-      print(sys.exc_info())
-      print("******************************")
-
+    
       abort(422)
   
   @app.errorhandler(400)

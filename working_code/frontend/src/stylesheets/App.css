@@ -1,5 +1,6 @@
 .App-header {
-  background-color: #222;
+  /* changed background color from #222 to #333*/
+  background-color: #333;
   color: white;
   display: flex;
   justify-content: space-between;
