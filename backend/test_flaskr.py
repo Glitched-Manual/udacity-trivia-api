@@ -1,3 +1,4 @@
+
 import os
 import unittest
 import json
@@ -15,9 +16,9 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        #self.password = ""
-        self.database_path = "postgresql://student:student@{}/{}".format('localhost:5432', self.database_name)
-        #self.database_path = "postgresql://{}/{}".format('localhost:5432', self.database_name)
+        self.database_path = "postgresql://student:student@{}/{}".format(
+            'localhost:5432', self.database_name)
+
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -26,13 +27,13 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
 
     """
-    
+
     Write at least one test for each test for successful operation and for expected errors.
     """
 
@@ -60,9 +61,9 @@ class TriviaTestCase(unittest.TestCase):
 
     """
     /questions tests
-    
+
     """
-        
+
     def test_get_paginated_questions(self):
         """Test to get some question from the database"""
 
@@ -72,7 +73,7 @@ class TriviaTestCase(unittest.TestCase):
         # check status code and success message
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        
+
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
 
@@ -81,6 +82,7 @@ class TriviaTestCase(unittest.TestCase):
     """
     Test for page of questions that does not exist
     """
+
     def test_404_page_not_found_request(self):
 
         res = self.client().get('/questions?page=9000')
@@ -89,18 +91,22 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
-    
+
     """
     /question delete tests
 
     """
-    
+
     def test_delete_question(self):
 
-        #create question to delete for test
-        test_question = Question(question='question', answer='answer', category=1, difficulty=1)
+        # create question to delete for test
+        test_question = Question(
+            question='question',
+            answer='answer',
+            category=1,
+            difficulty=1)
         test_question.insert()
-        
+
         test_question_id = test_question.id
 
         # call delete method
@@ -112,12 +118,11 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(res.status_code, 200)
         self.assertTrue(data['success'], True)
 
-        #check if te correct question was deleted
+        # check if te correct question was deleted
         self.assertEqual(str(data['deleted']), str(test_question_id))
 
-        #check if the created question is now None or Null value
+        # check if the created question is now None or Null value
         self.assertTrue(test_question, None)
-
 
     def test_422_for_deleting_question_that_does_not_exist(self):
 
@@ -128,13 +133,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["message"], "unprocessable")
 
-
     def test_create_question(self):
-       
+
         before_create_questions_length = len(Question.query.all())
 
-        test_question = {'question': 'question', 'answer': 'answer', 'category': 2, 'difficulty': 2}
-       
+        test_question = {
+            'question': 'question',
+            'answer': 'answer',
+            'category': 2,
+            'difficulty': 2}
 
         res = self.client().post('/questions', json=test_question)
         data = json.loads(res.data)
@@ -143,8 +150,9 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(before_create_questions_length, after__create_questions_length - 1)
-
+        self.assertEqual(
+            before_create_questions_length,
+            after__create_questions_length - 1)
 
     def test_422_create_question_error(self):
 
@@ -161,10 +169,11 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        
-        #check if question before and after lengths are the same
-        self.assertEqual(before_create_questions_total, after__create_questions_total)
 
+        # check if question before and after lengths are the same
+        self.assertEqual(
+            before_create_questions_total,
+            after__create_questions_total)
 
     def test_search_questions(self):
 
@@ -185,16 +194,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "resource not found")
 
-        
     def test_get_category_questions(self):
-        #get questions from an existing
+        # get questions from an existing
         res = self.client().get('/categories/2/questions')
 
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        
+
         self.assertTrue(len(data['questions']), True)
         self.assertTrue(data['total_questions'], True)
 
@@ -202,14 +210,14 @@ class TriviaTestCase(unittest.TestCase):
 
         res = self.client().get('/categories/9000/questions')
         data = json.loads(res.data)
-        
+
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "resource not found")
 
     def test_play_quiz(self):
         test_quiz_round = {'previous_questions': [],
-                           'quiz_category': { 'type': 'Art', 'id': 2}}
+                           'quiz_category': {'type': 'Art', 'id': 2}}
 
         res = self.client().post('/quizzes', json=test_quiz_round)
 
@@ -217,10 +225,10 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        
+
         self.assertTrue(data['question']['category'], 2)
-       
-    def test_422_quiz_error(self):       
+
+    def test_422_quiz_error(self):
         res = self.client().post('/quizzes', json={})
 
         data = json.loads(res.data)
@@ -228,6 +236,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "unprocessable")
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
